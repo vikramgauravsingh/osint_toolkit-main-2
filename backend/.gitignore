@@ -1,4 +1,6 @@
-sql_app.db
+ git config --global user.email "vikramgauravsingh@live.com"
+  git config --global user.name "vikramgauravsingh"
+  sql_app.db
 sql_app*
 data/
 *.db
