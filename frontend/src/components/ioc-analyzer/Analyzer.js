@@ -1,4 +1,5 @@
 import React, { useState, useRef } from "react";
+import SparkMD5 from "spark-md5";
 import Alert from "@mui/material/Alert";
 import { AlertTitle } from "@mui/material";
 import Grow from "@mui/material/Grow";
@@ -12,6 +13,7 @@ export default function Analyzer() {
   const [invalidInput, setInvalidInput] = useState(false);
   const [showTable, setShowTable] = useState(false);
   const inputRef = useRef(null);
+  const fileRef = useRef(null);
 
   const regexMap = [
     {
@@ -74,6 +76,24 @@ export default function Analyzer() {
     }
   };
 
+  const handleFilePick = async (event) => {
+    const file = event.target.files && event.target.files[0];
+    if (!file) return;
+    // Privacy-friendly hashing in browser
+    const buffer = await file.arrayBuffer();
+    const md5 = SparkMD5.ArrayBuffer.hash(buffer);
+    // Also compute SHA-1 and SHA-256 using SubtleCrypto
+    const sha1Buf = await crypto.subtle.digest("SHA-1", buffer);
+    const sha256Buf = await crypto.subtle.digest("SHA-256", buffer);
+    const toHex = (buf) => Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, '0')).join('');
+    const sha1 = toHex(sha1Buf);
+    const sha256 = toHex(sha256Buf);
+    // Prefer SHA256, then SHA1, then MD5
+    const preferred = sha256;
+    inputRef.current.value = preferred;
+    validateIocFromInput();
+  };
+
   return (
     <>
       <br />
@@ -85,6 +105,13 @@ export default function Analyzer() {
         onSearchClick={validateIocFromInput}
         sx={{ fontSize: '8px' }}
         size="small"
+      />
+      <br />
+      <input
+        type="file"
+        ref={fileRef}
+        onChange={handleFilePick}
+        style={{ marginTop: 8 }}
       />
       <br />
       <br />

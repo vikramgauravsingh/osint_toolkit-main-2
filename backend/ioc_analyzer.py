@@ -99,6 +99,21 @@ def abuseipdb_ip_check(ip: str, apikey: str):
         return {"error": response.status_code}
 
 
+def blocklist_de_ip_check(ip: str):
+    url = "https://api.blocklist.de/api.php"
+    params = {"ip": ip, "json": "1"}
+    response = requests.get(url=url, params=params)
+    if response.status_code == 200:
+        try:
+            return response.json()
+        except Exception:
+            # Fallback parse for legacy responses
+            text = response.text
+            return {"raw": text}
+    else:
+        return {"error": response.status_code}
+
+
 def alienvaultotx(ioc: str, type: str, apikey: str):
     if type == "ip":
         endpoint = "IPv4"

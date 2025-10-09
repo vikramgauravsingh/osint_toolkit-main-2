@@ -11,3 +11,5 @@ SQLAlchemy==1.4.36
 tweepy==4.9.0
 uvicorn==0.18.3
 email-validator==2.0.0
+python-jose[cryptography]==3.3.0
+PyJWT==2.9.0

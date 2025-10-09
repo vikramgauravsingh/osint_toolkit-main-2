@@ -3,6 +3,11 @@ services:
   backend:
     build: ./backend
     container_name: backend
+    environment:
+      - OIDC_ISSUER=${OIDC_ISSUER}
+      - OIDC_AUDIENCE=${OIDC_AUDIENCE}
+      - OIDC_JWKS_URL=${OIDC_JWKS_URL}
+      - OIDC_ALGORITHMS=${OIDC_ALGORITHMS:-RS256}
     ports:
       - "8000:8000"
     volumes:
@@ -13,6 +18,11 @@ services:
       #args:
       #  - BACKEND_URL=http://<IP_ADDRESS>:<PORT>  # Backend URL without trailing slash
     container_name: frontend
+    environment:
+      - REACT_APP_BACKEND_URL=${REACT_APP_BACKEND_URL:-http://localhost:8000}
+      - REACT_APP_OIDC_AUTHORITY=${REACT_APP_OIDC_AUTHORITY}
+      - REACT_APP_OIDC_CLIENT_ID=${REACT_APP_OIDC_CLIENT_ID}
+      - REACT_APP_OIDC_SCOPE=${REACT_APP_OIDC_SCOPE:-openid profile email}
     ports:
       - "3000:3000"
     stdin_open: true

@@ -1,6 +1,7 @@
-from sqlalchemy import Boolean, Column, ForeignKey, Integer, String, Sequence
+from sqlalchemy import Boolean, Column, ForeignKey, Integer, String, Sequence, DateTime
 from sqlalchemy.orm import relationship
 from .database import Base
+from datetime import datetime
 
 
 # Database model for the Apikey database
@@ -64,4 +65,22 @@ class NewsfeedSettings(Base):
             'url': self.url,
             'icon': self.icon,
             'enabled': self.enabled
+        }
+
+
+class QueryHistory(Base):
+    __tablename__ = "query_history"
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    ioc = Column(String, index=True)
+    ioc_type = Column(String, index=True)
+    user_sub = Column(String, default="")
+    created_at = Column(DateTime, default=datetime.utcnow)
+
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'ioc': self.ioc,
+            'ioc_type': self.ioc_type,
+            'user_sub': self.user_sub,
+            'created_at': self.created_at.isoformat()
         }

@@ -106,6 +106,17 @@ def ask_prompt(input: str, apikey: str, prompt: str):
             "Analyze the provided access control list (ACL) or permissions settings. Identify any potential security risks or misconfigurations. "
             "Provide recommendations for improving access control and ensuring proper security measures are in place: " + str(input)
         ),
+        'ioc_summary': (
+            "Given this indicator of compromise (IOC), provide a concise summary including IOC type, reputation from common sources, "
+            "and likely threat context. Output short bullet points with references if applicable: " + str(input)
+        ),
+        'risk_rating': (
+            "Assess the security risk of this IOC or artifact on a 1-10 scale. Justify the score with 3-5 bullets, "
+            "noting detection, prevalence, and potential impact: " + str(input)
+        ),
+        'ttp_mapping': (
+            "Map the observed behaviors or indicators to MITRE ATT&CK techniques (IDs and names). Provide a brief rationale per technique: " + str(input)
+        ),
     }
 
     # Model to use
