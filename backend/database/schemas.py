@@ -73,3 +73,21 @@ class NewsfeedSettingsCreateSchema(BaseModel):
     name: str
     url: str
     enabled: bool
+
+
+# ===========================================================================
+# Query history
+# ===========================================================================
+class QueryHistorySchema(BaseModel):
+    id: int
+    ioc: str
+    ioc_type: str
+    user_sub: str
+    created_at: str
+
+    class Config:
+        orm_mode = True
+
+class QueryHistoryCreateSchema(BaseModel):
+    ioc: str
+    ioc_type: str

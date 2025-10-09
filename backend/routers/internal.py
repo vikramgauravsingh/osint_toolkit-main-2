@@ -5,7 +5,7 @@ from dependencies import get_db, verify_jwt
 from database import crud, models, schemas
 from database.database import engine
 from database.models import Settings
-from database.schemas import ModuleSettingsSchema, ModuleSettingsCreateSchema
+from database.schemas import ModuleSettingsSchema, ModuleSettingsCreateSchema, NewsfeedSettingsSchema
 import ioc_extractor
 import email_analyzer
 import logging
@@ -263,9 +263,9 @@ def update_newsfeed_settings(settings: schemas.NewsfeedSettingsSchema, db: Sessi
 # Delete Newsfeed
 
 
-@router.delete("/api/settings/modules/newsfeed/{id}", response_model=schemas.NewsfeedSettingsSchema, tags=["OSINT Toolkit modules"])
-def delete_newsfeed_settings(id: int, db: Session = Depends(get_db)):
-    deleted_newsfeed = crud.delete_newsfeed_settings(db, id)
+@router.delete("/api/settings/modules/newsfeed/{name}", response_model=schemas.NewsfeedSettingsSchema, tags=["OSINT Toolkit modules"])
+def delete_newsfeed_settings(name: str, db: Session = Depends(get_db)):
+    deleted_newsfeed = crud.delete_newsfeed_settings(db, name)
     if not deleted_newsfeed:
         raise HTTPException(status_code=404, detail="Newsfeed not found")
     return {'Success': 'Newsfeed deleted'}
@@ -282,6 +282,16 @@ def enable_newsfeed(feedName: str, db: Session = Depends(get_db)):
     return newsfeed_state.to_dict()
 
 
+# Add a custom RSS feed
+@router.post("/api/settings/modules/newsfeed/", response_model=schemas.NewsfeedSettingsSchema, tags=["OSINT Toolkit modules"])
+def add_newsfeed(settings: NewsfeedSettingsSchema, db: Session = Depends(get_db)):
+    existing = crud.get_newsfeed_settings(db)
+    if any(s.name == settings.name for s in existing):
+        raise HTTPException(status_code=409, detail="Newsfeed with this name already exists")
+    created = crud.create_newsfeed_settings(db, settings)
+    return created.to_dict()
+
+
 @router.post("/api/settings/modules/newsfeed/disable", response_model=schemas.NewsfeedSettingsSchema, tags=["OSINT Toolkit modules"])
 def disable_newsfeed(feedName: str, db: Session = Depends(get_db)):
     newsfeed_state = crud.disable_feed(db=db, feedName=feedName)
@@ -291,3 +301,23 @@ def disable_newsfeed(feedName: str, db: Session = Depends(get_db)):
     db.commit()
     db.refresh(newsfeed_state)
     return newsfeed_state.to_dict()
+
+
+# ===========================================================================
+# History & stats
+# ===========================================================================
+@router.post("/api/history", tags=["OSINT Toolkit modules"])
+def add_history_entry(data: schemas.QueryHistoryCreateSchema, db: Session = Depends(get_db), user=Depends(verify_jwt)):
+    user_sub = user.get("sub", "") if isinstance(user, dict) else ""
+    entry = crud.add_history(db, data, user_sub)
+    return entry.to_dict()
+
+
+@router.get("/api/history", tags=["OSINT Toolkit modules"])
+def list_history(db: Session = Depends(get_db)):
+    return [e.to_dict() for e in crud.get_history(db)]
+
+
+@router.get("/api/stats", tags=["OSINT Toolkit modules"])
+def get_stats(db: Session = Depends(get_db)):
+    return crud.get_stats(db)

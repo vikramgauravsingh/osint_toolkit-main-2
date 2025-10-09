@@ -54,15 +54,12 @@ async def bgpview(ip):
     '''
     return ioc_analyzer.check_bgpview(ip)
 
-# TODO: finish
-"""
 @router.get("/api/ip/blocklist_de/{ip}", tags=["IP addresses"])
 async def blocklistde(ip):
     '''
     Get IP reputation from Blocklist.de
     '''
     return ioc_analyzer.blocklist_de_ip_check(ip)
-"""
 
 
 @router.get("/api/ip/crowdsec/{ip}", tags=["IP addresses"])
@@ -451,4 +448,31 @@ async def analyze_codedeobf_endpoint(input: dict = Body(..., example={"input": "
     apikey = crud.get_apikey(name="openai", db=SessionLocal())
     analysis_result = ask_prompt(
         inputdata, apikey['key'], 'accesscontrol')
+    return {"analysis_result": analysis_result}
+
+
+@router.post("/api/aiassistant/iocsummary", tags=["AI Assistant"])
+async def ai_ioc_summary(input: dict = Body(..., example={"input": "1.2.3.4"})):
+    inputdata = str(input["input"].encode('utf-8'))
+    apikey = crud.get_apikey(name="openai", db=SessionLocal())
+    analysis_result = ask_prompt(
+        inputdata, apikey['key'], 'ioc_summary')
+    return {"analysis_result": analysis_result}
+
+
+@router.post("/api/aiassistant/riskrating", tags=["AI Assistant"])
+async def ai_risk_rating(input: dict = Body(..., example={"input": "malicious.com"})):
+    inputdata = str(input["input"].encode('utf-8'))
+    apikey = crud.get_apikey(name="openai", db=SessionLocal())
+    analysis_result = ask_prompt(
+        inputdata, apikey['key'], 'risk_rating')
+    return {"analysis_result": analysis_result}
+
+
+@router.post("/api/aiassistant/ttpmapping", tags=["AI Assistant"])
+async def ai_ttp_mapping(input: dict = Body(..., example={"input": "powershell -enc ..."})):
+    inputdata = str(input["input"].encode('utf-8'))
+    apikey = crud.get_apikey(name="openai", db=SessionLocal())
+    analysis_result = ask_prompt(
+        inputdata, apikey['key'], 'ttp_mapping')
     return {"analysis_result": analysis_result}

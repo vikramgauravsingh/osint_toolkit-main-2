@@ -1,7 +1,7 @@
 from sqlalchemy.orm import Session
 from fastapi.exceptions import HTTPException
-from .models import Apikey, Settings, ModuleSettings, NewsfeedSettings
-from .schemas import ApikeySchema, SettingsSchema, NewsfeedSettingsSchema, ModuleSettingsCreateSchema
+from .models import Apikey, Settings, ModuleSettings, NewsfeedSettings, QueryHistory
+from .schemas import ApikeySchema, SettingsSchema, NewsfeedSettingsSchema, ModuleSettingsCreateSchema, QueryHistoryCreateSchema
 
 # ===========================================================================
 # API key settings CRUD operations
@@ -144,9 +144,9 @@ def update_newsfeed_settings(db: Session, name: str, settings: NewsfeedSettingsS
         return db_settings
 
 
-def delete_newsfeed_settings(db: Session, id: int):
+def delete_newsfeed_settings(db: Session, name: str):
     db_settings = db.query(NewsfeedSettings).filter(
-        NewsfeedSettings.name == id).first()
+        NewsfeedSettings.name == name).first()
     if db_settings:
         db.delete(db_settings)
         db.commit()
@@ -163,3 +163,27 @@ def disable_feed(db: Session, feedName: str):
     db.commit()
     db.refresh(setting)
     return setting
+
+
+# ===========================================================================
+# Query history CRUD operations
+# ===========================================================================
+def add_history(db: Session, data: QueryHistoryCreateSchema, user_sub: str):
+    entry = QueryHistory(ioc=data.ioc, ioc_type=data.ioc_type, user_sub=user_sub)
+    db.add(entry)
+    db.commit()
+    db.refresh(entry)
+    return entry
+
+
+def get_history(db: Session, limit: int = 100):
+    return db.query(QueryHistory).order_by(QueryHistory.created_at.desc()).limit(limit).all()
+
+
+def get_stats(db: Session):
+    # basic counts by type
+    rows = db.query(QueryHistory.ioc_type).all()
+    counts = {}
+    for (t,) in rows:
+        counts[t] = counts.get(t, 0) + 1
+    return counts

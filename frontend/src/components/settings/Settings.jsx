@@ -6,6 +6,7 @@ import About from "./About";
 import ApiKeys from "./ApiKeys";
 import General from "./General";
 import Modules from "./Modules";
+import RssFeeds from "./RssFeeds";
 
 import Card from "@mui/material/Card";
 import Tab from "@mui/material/Tab";
@@ -112,6 +113,22 @@ export default function Settings() {
     }} 
   />
   <Tab 
+    label="RSS Feeds" 
+    sx={{ 
+      justifyContent: 'flex-start',
+      textAlign: 'left',
+      width: '100%',
+      padding: '8px 16px',
+      minHeight: 'auto',
+      alignItems: 'flex-start',
+      '.MuiTab-wrapper': {
+        alignItems: 'flex-start',
+        textAlign: 'left',
+        width: '100%',
+      },
+    }} 
+  />
+  <Tab 
     label="About" 
     sx={{ 
       justifyContent: 'flex-start',
@@ -147,6 +164,11 @@ export default function Settings() {
         </Card>
       </SettingsTabPanel>
       <SettingsTabPanel value={tabIndex} index={3}>
+        <Card sx={cardStyle}>
+          <RssFeeds />
+        </Card>
+      </SettingsTabPanel>
+      <SettingsTabPanel value={tabIndex} index={4}>
         <Card sx={cardStyle}>
           <About />
         </Card>
