@@ -1,12 +1,13 @@
-from fastapi import APIRouter, Body
+from fastapi import APIRouter, Body, Depends
 from database import crud, models
 from database.database import SessionLocal, engine
 import ioc_analyzer
 from ai_assistant import ask_prompt
 import domain_monitoring
 import newsfeed
+from dependencies import verify_jwt
 
-router = APIRouter()
+router = APIRouter(dependencies=[Depends(verify_jwt)])
 models.Base.metadata.create_all(bind=engine)
 
 

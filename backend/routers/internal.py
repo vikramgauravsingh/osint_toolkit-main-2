@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException, File, UploadFile, status
 from fastapi.responses import JSONResponse
 from sqlalchemy.orm import Session
-from dependencies import get_db
+from dependencies import get_db, verify_jwt
 from database import crud, models, schemas
 from database.database import engine
 from database.models import Settings
@@ -11,7 +11,7 @@ import email_analyzer
 import logging
 from typing import Dict, Any
 
-router = APIRouter()
+router = APIRouter(dependencies=[Depends(verify_jwt)])
 models.Base.metadata.create_all(bind=engine)
 
 # ===========================================================================
